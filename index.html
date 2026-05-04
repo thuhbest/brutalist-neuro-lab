@@ -1,114 +1,1032 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrainSplit by Thuhbest</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainSplit — Thuhbest</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Unbounded:wght@300;700;900&family=Syne:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --left-bg: #0b0f1a;
+  --left-accent: #3b9eff;
+  --left-dim: rgba(59,158,255,0.12);
+  --left-text: #c8dff8;
+  --right-bg: #150b08;
+  --right-accent: #ff5b2e;
+  --right-dim: rgba(255,91,46,0.12);
+  --right-text: #f8d0c0;
+  --divide: #ffffff;
+  --divide-glow: rgba(255,255,255,0.15);
+  --font-logic: 'Share Tech Mono', monospace;
+  --font-display: 'Unbounded', sans-serif;
+  --font-body: 'Syne', sans-serif;
+}
+
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: #060608;
+}
+
+/* ── SCREENS ──────────────────────────────────────────────────── */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity 0.5s ease;
+  z-index: 20;
+}
+.screen.hidden { opacity: 0; pointer-events: none; }
+
+/* ── SPLIT BACKGROUND ─────────────────────────────────────────── */
+.split-bg {
+  position: fixed; inset: 0; z-index: 0;
+  display: flex;
+}
+.split-left {
+  flex: 1; background: var(--left-bg);
+  position: relative; overflow: hidden;
+}
+.split-right {
+  flex: 1; background: var(--right-bg);
+  position: relative; overflow: hidden;
+}
+.split-divide {
+  width: 2px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    var(--left-accent) 10%,
+    var(--divide) 30%,
+    var(--divide) 70%,
+    var(--right-accent) 90%,
+    transparent 100%);
+  box-shadow: 0 0 20px var(--divide-glow), 0 0 40px var(--divide-glow);
+  z-index: 5;
+  position: relative;
+}
+/* Scan line effect */
+.split-divide::after {
+  content: '';
+  position: absolute;
+  top: -20px; left: -8px;
+  width: 18px; height: 40px;
+  background: rgba(255,255,255,0.6);
+  filter: blur(6px);
+  animation: scanLine 3s linear infinite;
+}
+@keyframes scanLine {
+  0% { top: -40px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100vh; opacity: 0; }
+}
+
+/* Grid lines */
+.split-left::before, .split-right::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(59,158,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,158,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+.split-right::before {
+  background-image:
+    linear-gradient(rgba(255,91,46,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,91,46,0.04) 1px, transparent 1px);
+}
+
+/* Corner decorations */
+.split-left::after {
+  content: 'L';
+  position: absolute; bottom: 24px; right: 24px;
+  font-family: var(--font-display);
+  font-size: 120px; font-weight: 900;
+  color: rgba(59,158,255,0.04);
+  line-height: 1;
+  pointer-events: none;
+}
+.split-right::after {
+  content: 'R';
+  position: absolute; bottom: 24px; left: 24px;
+  font-family: var(--font-display);
+  font-size: 120px; font-weight: 900;
+  color: rgba(255,91,46,0.04);
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* ── TITLE SCREEN ─────────────────────────────────────────────── */
+#screen-title {
+  background: transparent;
+  gap: 0;
+}
+.title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  animation: titleReveal 0.8s ease both;
+}
+@keyframes titleReveal {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.title-eyebrow {
+  font-family: var(--font-logic);
+  font-size: 11px;
+  letter-spacing: 0.5em;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.title-main {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  position: relative;
+}
+.title-left { color: var(--left-accent); }
+.title-right { color: var(--right-accent); }
+.title-credit {
+  font-family: var(--font-logic);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.25);
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+.title-how {
+  display: flex;
+  gap: 2px;
+  margin-top: 40px;
+  width: min(780px, 90vw);
+  animation: titleReveal 0.8s 0.3s ease both;
+}
+.how-half {
+  flex: 1;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.how-half.how-left {
+  background: var(--left-dim);
+  border: 1px solid rgba(59,158,255,0.2);
+  border-right: none;
+}
+.how-half.how-right {
+  background: var(--right-dim);
+  border: 1px solid rgba(255,91,46,0.2);
+  border-left: none;
+}
+.how-heading {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+.how-left .how-heading { color: var(--left-accent); }
+.how-right .how-heading { color: var(--right-accent); }
+.how-body {
+  font-family: var(--font-logic);
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.5);
+}
+.how-keys {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.key-chip {
+  font-family: var(--font-logic);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  color: rgba(255,255,255,0.7);
+}
+.how-left .key-chip { background: rgba(59,158,255,0.15); border: 1px solid rgba(59,158,255,0.3); }
+.how-right .key-chip { background: rgba(255,91,46,0.15); border: 1px solid rgba(255,91,46,0.3); }
+
+.title-buttons {
+  display: flex; gap: 12px;
+  margin-top: 28px;
+  animation: titleReveal 0.8s 0.5s ease both;
+}
+.btn {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: none;
+  padding: 14px 32px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.1);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.btn:hover::after { opacity: 1; }
+.btn-solo {
+  background: var(--left-accent);
+  color: #000;
+}
+.btn-duo {
+  background: transparent;
+  color: var(--right-accent);
+  border: 1px solid var(--right-accent);
+}
+
+/* ── GAME HUD ─────────────────────────────────────────────────── */
+#game-wrapper {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  pointer-events: none;
+}
+#game-wrapper.hidden { display: none; }
+
+.hud-bar {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: rgba(0,0,0,0.5);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+.hud-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+.hud-title .hl { color: var(--left-accent); }
+.hud-title .hr { color: var(--right-accent); }
+
+.hud-scores {
+  display: flex; gap: 24px; align-items: center;
+}
+.hud-stat {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1px;
+}
+.hud-stat-label {
+  font-family: var(--font-logic);
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+}
+.hud-stat-value {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.9);
+  line-height: 1;
+  transition: color 0.3s;
+}
+.hud-stat-value.flash-left { color: var(--left-accent); }
+.hud-stat-value.flash-right { color: var(--right-accent); }
+
+.hud-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.1); }
+
+/* ── MAIN PLAY AREA ───────────────────────────────────────────── */
+.play-area {
+  flex: 1; display: flex;
+  pointer-events: all;
+  position: relative;
+}
+
+/* ── LEFT PANEL ───────────────────────────────────────────────── */
+.panel-left {
+  flex: 1;
+  display: flex; flex-direction: column;
+  padding: 28px 32px;
+  gap: 16px;
+}
+.panel-right {
+  flex: 1;
+  display: flex; flex-direction: column;
+  padding: 28px 32px;
+  gap: 16px;
+}
+
+.panel-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-left .panel-label { color: var(--left-accent); }
+.panel-right .panel-label { color: var(--right-accent); }
+.panel-label::after {
+  content: '';
+  flex: 1; height: 1px;
+}
+.panel-left .panel-label::after { background: rgba(59,158,255,0.2); }
+.panel-right .panel-label::after { background: rgba(255,91,46,0.2); }
+
+/* ── CHALLENGE CARD ───────────────────────────────────────────── */
+.challenge-card {
+  flex: 1;
+  border: 1px solid;
+  border-radius: 2px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.panel-left .challenge-card {
+  border-color: rgba(59,158,255,0.2);
+  background: rgba(59,158,255,0.03);
+}
+.panel-right .challenge-card {
+  border-color: rgba(255,91,46,0.2);
+  background: rgba(255,91,46,0.03);
+}
+.challenge-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+}
+.panel-left .challenge-card::before { background: var(--left-accent); }
+.panel-right .challenge-card::before { background: var(--right-accent); }
+
+.card-inner {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px;
+  gap: 16px;
+}
+
+/* Left brain question */
+.q-left {
+  font-family: var(--font-logic);
+  font-size: clamp(28px, 4vw, 48px);
+  color: var(--left-text);
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+.a-left {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 900;
+  color: var(--left-accent);
+  letter-spacing: 0.05em;
+  min-height: 1.2em;
+  text-align: center;
+  position: relative;
+}
+.a-left::after {
+  content: '_';
+  animation: blink 0.9s step-end infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: 1; } 50% { opacity: 0; }
+}
+.a-left.has-input::after { display: none; }
+
+/* Right brain question */
+.q-right {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+}
+.target-display {
+  display: flex; align-items: center; justify-content: center;
+}
+.target-color {
+  width: 80px; height: 56px;
+  border-radius: 2px;
+  border: 1px solid rgba(255,255,255,0.15);
+  position: relative;
+}
+.target-emoji {
+  font-size: 64px;
+  line-height: 1;
+}
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  max-width: 260px;
+}
+.opt {
+  border-radius: 2px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.15s ease;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.opt-color {
+  height: 52px;
+}
+.opt-emoji {
+  height: 64px;
+  background: rgba(255,255,255,0.04);
+  font-size: 36px;
+}
+.opt-label {
+  position: absolute;
+  bottom: 4px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--font-logic);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.4);
+}
+.opt:hover { border-color: rgba(255,91,46,0.5); transform: scale(1.03); }
+.opt.wrong { animation: optWrong 0.3s ease; border-color: rgba(255,255,255,0.6); }
+@keyframes optWrong {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* ── TIMER BAR ────────────────────────────────────────────────── */
+.timer-track {
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  position: relative;
+}
+.timer-fill {
+  height: 100%;
+  width: 100%;
+  transition: width 0.1s linear, background 0.3s;
+  position: relative;
+}
+.panel-left .timer-fill { background: var(--left-accent); }
+.panel-right .timer-fill { background: var(--right-accent); }
+.timer-fill.danger { background: #ff3b3b !important; }
+
+/* ── COMMENT TOASTS ───────────────────────────────────────────── */
+#toast-container {
+  position: fixed;
+  top: 70px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.toast {
+  font-family: var(--font-logic);
+  font-size: 12px;
+  padding: 8px 18px;
+  border-radius: 2px;
+  white-space: nowrap;
+  animation: toastIn 0.3s ease, toastOut 0.3s 1.8s ease forwards;
+  letter-spacing: 0.05em;
+}
+.toast-left {
+  color: var(--left-text);
+  background: rgba(59,158,255,0.15);
+  border: 1px solid rgba(59,158,255,0.3);
+}
+.toast-right {
+  color: var(--right-text);
+  background: rgba(255,91,46,0.15);
+  border: 1px solid rgba(255,91,46,0.3);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ── CORRECT FLASH ────────────────────────────────────────────── */
+.correct-flash {
+  position: absolute; inset: 0; pointer-events: none; z-index: 5;
+  opacity: 0; transition: opacity 0.1s;
+}
+.panel-left .correct-flash { background: rgba(59,158,255,0.12); }
+.panel-right .correct-flash { background: rgba(255,91,46,0.12); }
+.correct-flash.active { opacity: 1; }
+
+/* ── DEATH SCREEN ─────────────────────────────────────────────── */
+#screen-death {
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(12px);
+  z-index: 40;
+}
+.death-which {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.death-which.is-left { color: var(--left-accent); }
+.death-which.is-right { color: var(--right-accent); }
+
+.death-title {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 80px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: rgba(255,255,255,0.92);
+  line-height: 1;
+  text-align: center;
+}
+.death-reason {
+  font-family: var(--font-logic);
+  font-size: 13px;
+  color: rgba(255,255,255,0.3);
+  margin-top: 16px;
+  letter-spacing: 0.1em;
+}
+.death-stats {
+  display: flex; gap: 48px; margin-top: 40px;
+}
+.d-stat { text-align: center; }
+.d-stat-label {
+  font-family: var(--font-logic);
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+.d-stat-value {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+}
+.d-stat-value.left-color { color: var(--left-accent); }
+.d-stat-value.right-color { color: var(--right-accent); }
+.d-stat-value.white { color: rgba(255,255,255,0.85); }
+
+.death-hr {
+  width: 240px; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+  margin: 32px auto;
+}
+.btn-death {
+  display: flex; gap: 12px; justify-content: center;
+}
+
+/* ── CREDIT ───────────────────────────────────────────────────── */
+.credit-fixed {
+  position: fixed;
+  bottom: 14px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  font-family: var(--font-logic);
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.15);
+  text-transform: uppercase;
+  pointer-events: none;
+  white-space: nowrap;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="start-screen" id="start-screen">
-            <h1>🧠 BrainSplit 🧠</h1>
-            <div class="author">by Thuhbest</div>
-            
-            <div class="game-manual">
-                <h3>How to Play</h3>
-                <p>Control two brains at once! Complete both challenges before time runs out.</p>
-                
-                <div class="manual-section">
-                    <h4>Left Brain (Logical)</h4>
-                    <p>Solve math problems using number keys:</p>
-                    <div class="number-pad">
-                        <div class="number-row">
-                            <button class="num-key">1</button>
-                            <button class="num-key">2</button>
-                            <button class="num-key">3</button>
-                        </div>
-                        <div class="number-row">
-                            <button class="num-key">4</button>
-                            <button class="num-key">5</button>
-                            <button class="num-key">6</button>
-                        </div>
-                        <div class="number-row">
-                            <button class="num-key">7</button>
-                            <button class="num-key">8</button>
-                            <button class="num-key">9</button>
-                        </div>
-                        <div class="number-row">
-                            <button class="wide-key">Backspace</button>
-                            <button class="num-key">0</button>
-                            <button class="wide-key">Enter</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="manual-section">
-                    <h4>Right Brain (Creative)</h4>
-                    <p>Match colors or emojis using arrow keys:</p>
-                    <div class="arrow-keys">
-                        <div class="arrow-row">
-                            <button class="arrow-key">↑</button>
-                        </div>
-                        <div class="arrow-row">
-                            <button class="arrow-key">←</button>
-                            <button class="arrow-key">↓</button>
-                            <button class="arrow-key">→</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="start-buttons">
-                <button class="start-button" id="start-button">Start Game</button>
-                <button class="meld-button" id="meld-button">2 Player Mode</button>
-            </div>
+
+<!-- ── SPLIT BACKGROUND ────────────────────────────────────────────── -->
+<div class="split-bg">
+  <div class="split-left"></div>
+  <div class="split-divide"></div>
+  <div class="split-right"></div>
+</div>
+
+<!-- ── TITLE SCREEN ────────────────────────────────────────────────── -->
+<div class="screen" id="screen-title">
+  <div class="title-block">
+    <div class="title-eyebrow">Dual-hemisphere challenge</div>
+    <div class="title-main">
+      <span class="title-left">Brain</span><span class="title-right">Split</span>
+    </div>
+    <div class="title-credit">Designed by Thuhbest</div>
+  </div>
+
+  <div class="title-how">
+    <div class="how-half how-left">
+      <div class="how-heading">Left Hemisphere — Logic</div>
+      <div class="how-body">Solve math equations and number sequences. Type your answer, hit Enter.</div>
+      <div class="how-keys">
+        <span class="key-chip">0–9</span>
+        <span class="key-chip">Backspace</span>
+        <span class="key-chip">Enter</span>
+      </div>
+    </div>
+    <div class="how-half how-right">
+      <div class="how-heading">Right Hemisphere — Creative</div>
+      <div class="how-body">Match colours and emojis. Arrow keys select the four options.</div>
+      <div class="how-keys">
+        <span class="key-chip">↑ top-right</span>
+        <span class="key-chip">→ bot-right</span>
+        <span class="key-chip">← top-left</span>
+        <span class="key-chip">↓ bot-left</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="title-buttons">
+    <button class="btn btn-solo" id="btn-solo">Solo Mode</button>
+    <button class="btn btn-duo" id="btn-duo">2 Player Mode</button>
+  </div>
+</div>
+
+<!-- ── GAME ────────────────────────────────────────────────────────── -->
+<div id="game-wrapper" class="hidden">
+  <div class="hud-bar">
+    <div class="hud-title"><span class="hl">Brain</span><span class="hr">Split</span></div>
+    <div class="hud-scores">
+      <div class="hud-stat">
+        <span class="hud-stat-label">time</span>
+        <span class="hud-stat-value" id="hud-time">0</span>
+      </div>
+      <div class="hud-divider"></div>
+      <div class="hud-stat">
+        <span class="hud-stat-label">best</span>
+        <span class="hud-stat-value" id="hud-best">0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="play-area">
+    <!-- Left panel -->
+    <div class="panel-left">
+      <div class="panel-label">Logical hemisphere</div>
+      <div class="challenge-card" id="left-card">
+        <div class="timer-track"><div class="timer-fill" id="left-timer"></div></div>
+        <div class="card-inner">
+          <div class="q-left" id="left-q">—</div>
+          <div class="a-left" id="left-a" data-val=""></div>
         </div>
-
-        <div class="game-container" id="game-container" style="display:none;">
-            <header>
-                <h1>🧠 BrainSplit 🧠</h1>
-                <div class="score-container">
-                    <div class="score">Time: <span id="score">0</span>s</div>
-                    <div class="best-score">Best: <span id="best-score">0</span>s</div>
-                </div>
-            </header>
-
-            <div class="grid-container">
-                <div class="grid-left">
-                    <div class="grid-header">Left Brain (Logical)</div>
-                    <div class="challenge-box" id="left-challenge">
-                        <div class="question" id="left-question"></div>
-                        <div class="answer" id="left-answer"></div>
-                        <div class="timer-container">
-                            <div class="timer-bar" id="left-timer"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid-right">
-                    <div class="grid-header">Right Brain (Creative)</div>
-                    <div class="challenge-box" id="right-challenge">
-                        <div class="question" id="right-question"></div>
-                        <div class="challenge-content" id="right-content"></div>
-                        <div class="options" id="right-options"></div>
-                        <div class="timer-container">
-                            <div class="timer-bar" id="right-timer"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="game-message" id="game-message" style="display:none;">
-            <p id="message-text"></p>
-            <div class="buttons">
-                <button class="retry-button" id="retry">Try Again</button>
-            </div>
-        </div>
+        <div class="correct-flash" id="left-flash"></div>
+      </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Right panel -->
+    <div class="panel-right">
+      <div class="panel-label">Creative hemisphere</div>
+      <div class="challenge-card" id="right-card">
+        <div class="timer-track"><div class="timer-fill" id="right-timer"></div></div>
+        <div class="card-inner">
+          <div class="q-right" id="right-q">Match the target</div>
+          <div class="target-display" id="right-target"></div>
+          <div class="options-grid" id="right-options"></div>
+        </div>
+        <div class="correct-flash" id="right-flash"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ───────────────────────────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<!-- ── DEATH SCREEN ────────────────────────────────────────────────── -->
+<div class="screen hidden" id="screen-death">
+  <div class="death-which" id="death-which">—</div>
+  <div class="death-title">Signal Lost</div>
+  <div class="death-reason" id="death-reason">—</div>
+  <div class="death-stats">
+    <div class="d-stat">
+      <span class="d-stat-label">session</span>
+      <div class="d-stat-value white" id="d-score">0</div>
+    </div>
+    <div class="d-stat">
+      <span class="d-stat-label">record</span>
+      <div class="d-stat-value" id="d-best">0</div>
+    </div>
+  </div>
+  <div class="death-hr"></div>
+  <div class="btn-death">
+    <button class="btn btn-solo" id="btn-retry-solo">Solo Again</button>
+    <button class="btn btn-duo" id="btn-retry-duo">2 Player</button>
+  </div>
+</div>
+
+<!-- ── CREDIT ──────────────────────────────────────────────────────── -->
+<div class="credit-fixed">Designed by Thuhbest</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// BrainSplit — game engine
+// ═══════════════════════════════════════════════════════════
+
+let state = {
+  phase: 'title',
+  score: 0,
+  best: parseInt(localStorage.getItem('bs_best') || '0'),
+  interval: null,
+  twoPlayer: false,
+};
+
+let leftCh = null, rightCh = null;
+
+const COLORS_LIST = [
+  { hex: '#3b9eff', label: 'azure' },
+  { hex: '#ff5b2e', label: 'ember' },
+  { hex: '#2ecc8a', label: 'mint' },
+  { hex: '#f7c94b', label: 'gold' },
+  { hex: '#bf6bff', label: 'violet' },
+];
+const EMOJIS = ['😤','🤯','👾','💀','🔥','⚡','🌀','🎯','🧩','🕶️'];
+
+// ── DOM refs ────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const screenTitle = $('screen-title');
+const screenDeath = $('screen-death');
+const gameWrapper = $('game-wrapper');
+
+// ── Button wiring ───────────────────────────────────────────
+$('btn-solo').addEventListener('click', () => startGame(false));
+$('btn-duo').addEventListener('click', () => startGame(true));
+$('btn-retry-solo').addEventListener('click', () => startGame(false));
+$('btn-retry-duo').addEventListener('click', () => startGame(true));
+
+document.addEventListener('keydown', handleKey);
+
+// ── Init ─────────────────────────────────────────────────────
+$('hud-best').textContent = state.best;
+
+// ── Start ────────────────────────────────────────────────────
+function startGame(two) {
+  state.twoPlayer = two;
+  state.score = 0;
+  state.phase = 'playing';
+  clearInterval(state.interval);
+
+  hide(screenTitle); hide(screenDeath);
+  show(gameWrapper);
+
+  $('hud-time').textContent = 0;
+  $('hud-best').textContent = state.best;
+
+  genLeft(); genRight();
+  state.interval = setInterval(tick, 100);
+}
+
+// ── Tick ─────────────────────────────────────────────────────
+function tick() {
+  if (state.phase !== 'playing') return;
+  state.score++;
+  $('hud-time').textContent = state.score;
+
+  const difficulty = Math.min(8, Math.floor(state.score / 20));
+  const timeLimit = Math.max(5, 10 - difficulty) * 10; // in ticks
+
+  const leftElapsed = (Date.now() - leftCh.startTime) / 100;
+  const rightElapsed = (Date.now() - rightCh.startTime) / 100;
+
+  const lRem = Math.max(0, 1 - leftElapsed / timeLimit);
+  const rRem = Math.max(0, 1 - rightElapsed / timeLimit);
+
+  $('left-timer').style.width = (lRem * 100) + '%';
+  $('right-timer').style.width = (rRem * 100) + '%';
+
+  const DANGER = 0.25;
+  $('left-timer').classList.toggle('danger', lRem < DANGER);
+  $('right-timer').classList.toggle('danger', rRem < DANGER);
+
+  if (lRem <= 0) return die('Left brain timed out', 'left');
+  if (rRem <= 0) return die('Right brain timed out', 'right');
+
+  if (Math.random() < 0.006) showToast();
+}
+
+// ── Generate left ─────────────────────────────────────────────
+function genLeft() {
+  const type = Math.random() < 0.6 ? 'math' : 'seq';
+  let q, ans;
+
+  if (type === 'math') {
+    const a = rnd(2, 12), b = rnd(2, 12);
+    const ops = ['+', '-', '×'];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    const val = op === '+' ? a+b : op === '-' ? a-b : a*b;
+    q = `${a} ${op} ${b}  =  ?`;
+    ans = String(val);
+  } else {
+    const start = rnd(1, 8), step = rnd(1, 4);
+    q = `${start}  ${start+step}  ${start+step*2}  ?`;
+    ans = String(start + step * 3);
+  }
+
+  leftCh = { q, ans, input: '', startTime: Date.now() };
+  $('left-q').textContent = q;
+  const el = $('left-a');
+  el.textContent = '';
+  el.dataset.val = '';
+  el.classList.remove('has-input');
+}
+
+// ── Generate right ────────────────────────────────────────────
+function genRight() {
+  const type = Math.random() < 0.5 ? 'color' : 'emoji';
+  rightCh = { type, answer: null, options: [], startTime: Date.now() };
+
+  const targetEl = $('right-target');
+  const optsEl = $('right-options');
+  targetEl.innerHTML = ''; optsEl.innerHTML = '';
+
+  if (type === 'color') {
+    const pool = shuffle([...COLORS_LIST]);
+    const target = pool[0];
+    const opts = pool.slice(0, 4);
+    rightCh.answer = target.hex;
+    rightCh.options = opts.map(c => c.hex);
+
+    const t = document.createElement('div');
+    t.className = 'target-color';
+    t.style.background = target.hex;
+    t.style.boxShadow = `0 0 20px ${target.hex}44`;
+    targetEl.appendChild(t);
+
+    $('right-q').textContent = 'Match the colour';
+
+    opts.forEach((c, i) => {
+      const o = document.createElement('div');
+      o.className = 'opt opt-color';
+      o.style.background = c.hex;
+      o.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,0.1)`;
+      o.dataset.i = i;
+      o.addEventListener('click', () => handleRight(i));
+      optsEl.appendChild(o);
+    });
+  } else {
+    const pool = shuffle([...EMOJIS]).slice(0, 4);
+    const target = pool[0];
+    rightCh.answer = target;
+    rightCh.options = pool;
+
+    const t = document.createElement('div');
+    t.className = 'target-emoji';
+    t.textContent = target;
+    targetEl.appendChild(t);
+
+    $('right-q').textContent = 'Find the match';
+
+    const arrowLabels = ['↖', '↙', '↗', '↘'];
+    pool.forEach((e, i) => {
+      const o = document.createElement('div');
+      o.className = 'opt opt-emoji';
+      o.textContent = e;
+      o.dataset.i = i;
+      const lbl = document.createElement('div');
+      lbl.className = 'opt-label';
+      lbl.textContent = arrowLabels[i];
+      o.appendChild(lbl);
+      o.addEventListener('click', () => handleRight(i));
+      optsEl.appendChild(o);
+    });
+  }
+}
+
+// ── Key handler ───────────────────────────────────────────────
+function handleKey(e) {
+  if (state.phase !== 'playing') return;
+
+  // Left brain
+  const numKeys = ['0','1','2','3','4','5','6','7','8','9'];
+  if (numKeys.includes(e.key)) {
+    e.preventDefault();
+    leftCh.input += e.key;
+    const el = $('left-a');
+    el.textContent = leftCh.input;
+    el.classList.add('has-input');
+  }
+  if (e.key === 'Backspace') {
+    e.preventDefault();
+    leftCh.input = leftCh.input.slice(0,-1);
+    const el = $('left-a');
+    el.textContent = leftCh.input;
+    if (!leftCh.input) el.classList.remove('has-input');
+  }
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (leftCh.input === leftCh.ans) {
+      flash('left');
+      genLeft();
+      pulseScore('left');
+    } else {
+      die('Wrong answer', 'left');
+    }
+  }
+
+  // Right brain — arrow mapping: ← = 0 (top-left), ↓ = 1 (bottom-left), → = 2 (top-right), ↑ = 3 (bottom-right)
+  const arrowMap = { ArrowLeft: 0, ArrowDown: 1, ArrowRight: 2, ArrowUp: 3 };
+  if (arrowMap[e.key] !== undefined) {
+    e.preventDefault();
+    handleRight(arrowMap[e.key]);
+  }
+}
+
+function handleRight(idx) {
+  if (state.phase !== 'playing') return;
+  const picked = rightCh.options[idx];
+  if (picked === rightCh.answer) {
+    flash('right');
+    genRight();
+    pulseScore('right');
+  } else {
+    // wrong shake
+    const opts = document.querySelectorAll('.opt');
+    opts[idx]?.classList.add('wrong');
+    setTimeout(() => opts[idx]?.classList.remove('wrong'), 300);
+    die('Wrong selection', 'right');
+  }
+}
+
+// ── Die ───────────────────────────────────────────────────────
+function die(reason, side) {
+  if (state.phase !== 'playing') return;
+  state.phase = 'dead';
+  clearInterval(state.interval);
+
+  const isNew = state.score > state.best;
+  if (isNew) {
+    state.best = state.score;
+    localStorage.setItem('bs_best', state.best);
+  }
+
+  $('d-score').textContent = state.score;
+  $('d-best').textContent = state.best;
+  $('d-best').className = 'd-stat-value ' + (side === 'left' ? 'left-color' : 'right-color');
+  $('death-reason').textContent = reason + (isNew ? '  —  new record' : '');
+  $('death-which').textContent = side === 'left' ? 'Left hemisphere failure' : 'Right hemisphere failure';
+  $('death-which').className = 'death-which is-' + side;
+
+  hide(gameWrapper);
+  show(screenDeath);
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function flash(side) {
+  const el = $(side + '-flash');
+  el.classList.add('active');
+  setTimeout(() => el.classList.remove('active'), 150);
+}
+
+function pulseScore(side) {
+  const el = $('hud-time');
+  el.classList.add('flash-' + side);
+  setTimeout(() => el.classList.remove('flash-left', 'flash-right'), 400);
+}
+
+function show(el) { el.classList.remove('hidden'); }
+function hide(el) { el.classList.add('hidden'); }
+function rnd(a, b) { return Math.floor(Math.random() * (b-a+1)) + a; }
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ── Toast comments ────────────────────────────────────────────
+const TOASTS = [
+  { side: 'left', text: '> run faster, human.' },
+  { side: 'right', text: 'use your instincts.' },
+  { side: 'left', text: '> numbers do not lie.' },
+  { side: 'right', text: 'patterns are everywhere.' },
+  { side: 'left', text: '> calculating your failure...' },
+  { side: 'right', text: 'feel the colour, don\'t think.' },
+  { side: 'left', text: '> sequence detected.' },
+  { side: 'right', text: 'beautiful chaos.' },
+];
+function showToast() {
+  const t = TOASTS[Math.floor(Math.random() * TOASTS.length)];
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + t.side;
+  el.textContent = t.text;
+  $('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+}
+</script>
 </body>
 </html>
